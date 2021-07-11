@@ -20,8 +20,6 @@ from transformers.modeling_roberta import (
 
 from .CVAEModel import CVAEModel, Similarity
 from .Attention import AttentionInArgs
-from .SelfAttention import SelfAttention
-from .GATModel import GAT
 
 import logging
 logger = logging.getLogger(__name__)
@@ -63,10 +61,6 @@ class RobertaPDTBModel(RobertaPreTrainedModel):
         self.cvae = CVAEModel(config.hidden_size, config.hidden_size)
 
         # 加attention
-        self.self_attention = SelfAttention(input_size=768,
-                                         embedding_dim=256,
-                                         output_size=768
-                                         )
         # self.self_atten = nn.MultiheadAttention(768, 2)
         self.attention = AttentionInArgs(input_size=768,
                                          embedding_dim=256,
@@ -93,9 +87,6 @@ class RobertaPDTBModel(RobertaPreTrainedModel):
         arg1, arg2 = sequence_output[:, :arg_len, :], sequence_output[:, arg_len:, :]
         # arg1_mask, arg2_mask = attention_mask[:, :arg_len], attention_mask[:, :arg_len]
         # 目标: [8, 256, 256]
-        # 测试1
-        # arg1 = self.self_attention(arg1, arg1)
-        # arg2 = self.self_attention(arg2, arg2)
         sequence_output = self.attention(arg1, arg2, attention_mask)  # [8, 256]
         
         # logging.info('adj: ' + str(adj[0]) + ' ' + str(adj.shape))
@@ -210,12 +201,6 @@ class RobertaPDTBModel(RobertaPreTrainedModel):
                 if do_cvae > 0:
                     # print(loss, cvae_loss, cvae_loss_neg)
                     loss = loss + args.cvae_beta * cvae_loss - args.cvae_theta * cvae_loss_neg
-                    # loss = loss + args.cvae_theta * sim_contrast_loss
-                    if global_step % args.logging_steps == 0:
-                        # fitlog.add_loss(sim_contrast_loss, name='sim loss', step=global_step)
-                        fitlog.add_loss(cvae_loss*1000%1000, name = 'positive_loss', step=global_step)
-                        fitlog.add_loss(cvae_loss_neg*1000%1000, name = 'negative_loss', step=global_step)
-                        fitlog.add_loss(cvae_loss - cvae_loss_neg, name = 'pos - neg', step=global_step)
 
         if not return_dict:
             output = (logits,) + outputs[2:]
