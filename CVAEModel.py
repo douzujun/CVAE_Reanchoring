@@ -106,18 +106,6 @@ class CVAEModel(nn.Module):
         self.layernorm = nn.LayerNorm(hidden_size)
         self.lb = LabelBinarizer()
 
-        # 加attention
-        # self.attention = AttentionInArgs(input_size=768,
-        #                                  embedding_dim=256,
-        #                                  output_size=768
-        #                                  )
-        # self.self_attention = SelfAttention(input_size=768,
-        #                                  embedding_dim=256,
-        #                                  output_size=768
-        #                                  )
-        # torch.Size([8, 256, 768]) torch.Size([8, 256, 256])
-        # self.gat = GAT(in_features=768, n_dim=256, n_class=768)
-
         # cnn
         self.cnn01 = TextCNN(input_size, output_size)
         self.cnn11 = TextCNN(input_size, output_size, kernel_lst=(6, 8))
@@ -171,21 +159,6 @@ class CVAEModel(nn.Module):
         y_one_hot = y_one_hot.to(device)
         return y_one_hot
 
-    # def _add_attention(self, x):
-    #     # 加attention
-    #     arg_len = x.shape[1] // 2
-    #     # X: [8, 128, 768], [8, 128, 768] --> [8, 256, 768]
-    #     # X: [8, 82, 768], [8, 82, 768] --> [8, 164, 768]
-    #     arg1, arg2 = x[:, :arg_len, :], x[:, arg_len:, :]
-    #     # logging.info(str(arg1) + ' ' + str(arg1.shape))
-    #     # logging.info(str(arg2) + ' ' + str(arg2.shape))
-    #     # 目标: [8, 256, 256]
-    #     out = self.attention(arg1, arg2)
-    #     # logging.info('adj: ' + str(adj[0]) + ' ' + str(adj.shape))
-    #     # 只是做个 mm
-    #     # out = self.gat(x, out)
-    #     return out
-
     def encode(self, x, y=None, Training=False, device=None):
         if Training:
             # 加RNN
@@ -204,9 +177,6 @@ class CVAEModel(nn.Module):
             
             # 加CNN2
             # out = self.cnn11(out)
-
-            # 加attention
-            # out = self._add_attention(x)
 
             return F.relu(self.fc11(out)), F.relu(self.fc12(out))
             # return F.relu(self.fc11(x + out)), F.relu(self.fc12(x + out))
