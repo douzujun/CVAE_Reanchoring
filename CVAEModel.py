@@ -169,7 +169,7 @@ class CVAEModel(nn.Module):
             con = con + y_c   
             
             # 加RNN
-            out = self.rnn01(con)
+            # out = self.rnn01(con)
             # 加CNN
             out = self.cnn01(con)
             
@@ -182,7 +182,7 @@ class CVAEModel(nn.Module):
             # return F.relu(self.fc11(x + out)), F.relu(self.fc12(x + out))
         else:
             # 只用RNN
-            out = self.rnn01(x)
+            # out = self.rnn01(x)
             # 加CNN
             out = self.cnn01(x)
 
